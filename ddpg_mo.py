@@ -57,7 +57,7 @@ def main():
     parser.add_argument('--steps', type=int, default=10 ** 4)
     parser.add_argument('--n-hidden-channels', type=int, default=300)
     parser.add_argument('--n-hidden-layers', type=int, default=3)
-    parser.add_argument('--replay-start-size', type=int, default=2000)
+    parser.add_argument('--replay-start-size', type=int, default=5000)
     parser.add_argument('--n-update-times', type=int, default=1)
     parser.add_argument('--target-update-interval',
                         type=int, default=1)

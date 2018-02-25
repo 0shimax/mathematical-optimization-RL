@@ -53,7 +53,8 @@ class Easy2D(Env):
         self.action_space.set_seed(seed)
 
     def step(self, action):
-        reword = self.reword(action)
+        self.pre_obs[0] += action
+        reword = self.reword(self.pre_obs[0])
         done = False if np.isnan(reword) or np.isinf(reword) else True
         return self.pre_obs, reword, done, None
 

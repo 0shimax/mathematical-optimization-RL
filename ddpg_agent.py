@@ -323,11 +323,12 @@ class DDPG(AttributeSavingMixin, Agent):
     def act(self, obs):
         with chainer.using_config('train', False):
             print("obs:", obs)
+            # print("obs:", obs)
             s = self.batch_states(obs, self.xp, self.phi)
-            print("state:", s)
-            # print("self.policy", self.policy.W.shape)
+            print("state:", s.shape)
+            # print("state:", s)
             action = self.policy(s).sample()
-            print("action:", action)
+            print("action:", action.shape)
             # Q is not needed here, but log it just for information
             q = self.q_function(s, action)
 

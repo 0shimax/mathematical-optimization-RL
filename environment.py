@@ -85,31 +85,30 @@ class Griewank(Env):
 
     def reset(self):
         x = self.action_space.sample()
-        y = -1*(np.cos(3*x) + x**2 - x)
-        self.pre_obs = [x, y]
+        cos_x = x/np.sqrt(np.arange(len(x))+1)
+        r = np.sum(np.power(x, 2))/4000 - np.prod(np.cos(cos_x))
+        y = -r
+        self.pre_obs = [*x, y]
         return np.asarray([self.pre_obs], dtype=np.float32)
-        # self.pre_obs = np.asarray([[x, y]], dtype=np.float32)
-        # return self.pre_obs
 
     def reword(self, x):
         cos_x = x/np.sqrt(np.arange(len(x))+1)
         r = np.sum(np.power(x, 2))/4000 - np.prod(np.cos(cos_x))
         r = -r
         reword = r
-        self.pre_obs = np.asarray([x, r], dtype=np.float32)
-        # self.pre_obs[:, 0] = x
-        # self.pre_obs[:,1] = r
+        self.pre_obs = np.asarray([*x, r], dtype=np.float32)
         return np.asarray([[reword]], dtype=np.float32)
 
     def seed(self, seed):
         self.action_space.set_seed(seed)
 
     def step(self, action):
-        self.pre_obs[0] += action
-        print("self.pre_obs0", self.pre_obs)
-        reword = self.reword(self.pre_obs[0])
-        print("self.pre_obs1", self.pre_obs)
-        # done = False if np.isnan(reword) or np.isinf(reword) else True
+        print("action:", action.shape)
+        print("self.pre_obs0", len(self.pre_obs))
+        self.pre_obs[:-1] += action
+        print("self.pre_obs1", len(self.pre_obs))
+        reword = self.reword(self.pre_obs[:-1])
+        print("self.pre_obs2", len(self.pre_obs))
         done = True
         return self.pre_obs, reword, done, None
 

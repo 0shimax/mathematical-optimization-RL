@@ -23,7 +23,8 @@ from ddpg_agent import DDPGModel
 from chainerrl import experiments
 from chainerrl import explorers
 from chainerrl import misc
-from chainerrl import policy
+# from chainerrl import policy
+import deterministic_policy as policy
 # from chainerrl import q_functions
 import q_func as q_functions
 from chainerrl import replay_buffer
@@ -119,7 +120,9 @@ def main():
         return env
 
     env = make_env(test=False, env_name=args.env, obs_dim=args.obs_dim,
-                   action_dim=args.action_dim, action_low=-10, action_high=10)
+                   action_dim=args.action_dim,
+                   action_low=args.action_low,
+                   action_high=args.action_high)
     # timestep_limit = env.spec.tags.get(
     #     'wrapper_config.TimeLimit.max_episode_steps')
     timestep_limit = env.timestep_limit
@@ -185,7 +188,10 @@ def main():
     if len(args.load) > 0:
         agent.load(args.load)
 
-    eval_env = make_env(test=True)
+    eval_env = make_env(test=True, env_name=args.env, obs_dim=args.obs_dim,
+                        action_dim=args.action_dim,
+                        action_low=args.action_low,
+                        action_high=args.action_high)
     if args.demo:
         eval_stats = experiments.eval_performance(
             env=eval_env,

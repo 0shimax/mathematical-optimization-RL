@@ -28,7 +28,7 @@ from chainerrl import policy
 import q_func as q_functions
 from chainerrl import replay_buffer
 
-from environment import Easy2D
+from environment import Easy2D, Griewank
 
 
 def main():
@@ -37,16 +37,16 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--outdir', type=str, default='out')
-    parser.add_argument('--env', type=str, default='Humanoid-v2')
+    parser.add_argument('--env', type=str, default='griewank')
     parser.add_argument('--seed', type=int, default=0,
                         help='Random seed [0, 2 ** 32)')
-    parser.add_argument('--obs_dim', type=int, default=1,
+    parser.add_argument('--obs-dim', type=int, default=1,
                         help='int')
-    parser.add_argument('--action_dim', type=int, default=1,
+    parser.add_argument('--action-dim', type=int, default=1,
                         help='int')
-    parser.add_argument('--action_low', type=int, default=-100,
+    parser.add_argument('--action-low', type=int, default=-100,
                         help='int. action state low limit.')
-    parser.add_argument('--action_high', type=int, default=100,
+    parser.add_argument('--action-high', type=int, default=100,
                         help='int. action state high limit.')
     parser.add_argument('--gpu', type=int, default=-1)
     # parser.add_argument('--final-exploration-steps',
@@ -86,15 +86,24 @@ def main():
 
     def clip_action_filter(a):
         print("clip_", a)
-        return np.clip(a, action_space.low, action_space.high)
+        return np.clip(a, args.action_low, args.action_high)
 
     def reward_filter(r):
         return r * args.reward_scale_factor
 
-    def make_env(test, obs_dim=1, action_dim=1,
+    def make_env(test, env_name='griewank', obs_dim=1, action_dim=1,
                  action_low=-100, action_high=100):
-        env = Easy2D(test=test, obs_dim=obs_dim, action_dim=action_dim,
-                     action_low=args.action_low, action_high=args.action_high)
+        env = None
+        if env_name == 'griewank':
+            env = Griewank(test=test, obs_dim=obs_dim,
+                           action_dim=action_dim,
+                           action_low=args.action_low,
+                           action_high=args.action_high)
+        elif env_name == 'easy2d':
+            env = Easy2D(test=test, obs_dim=obs_dim,
+                         action_dim=action_dim,
+                         action_low=args.action_low,
+                         action_high=args.action_high)
         # Use different random seeds for train and test envs
         env_seed = 2 ** 32 - 1 - args.seed if test else args.seed
         env.seed(env_seed)
@@ -109,7 +118,7 @@ def main():
         #     misc.env_modifiers.make_rendered(env)
         return env
 
-    env = make_env(test=False, obs_dim=args.obs_dim,
+    env = make_env(test=False, env_name=args.env, obs_dim=args.obs_dim,
                    action_dim=args.action_dim, action_low=-10, action_high=10)
     # timestep_limit = env.spec.tags.get(
     #     'wrapper_config.TimeLimit.max_episode_steps')

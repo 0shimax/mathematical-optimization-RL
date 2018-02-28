@@ -75,6 +75,7 @@ def main():
     parser.add_argument('--use-bn', action='store_true', default=False)
     parser.add_argument('--monitor', action='store_true')
     parser.add_argument('--reward-scale-factor', type=float, default=1e-2)
+    parser.add_argument('--sigma-scale-factor', type=float, default=5e-2)
     args = parser.parse_args()
 
     args.outdir = experiments.prepare_output_dir(
@@ -174,7 +175,7 @@ def main():
             a = a.astype(np.float32)
         return a
 
-    ou_sigma = (action_space.high - action_space.low) * 0.05
+    ou_sigma = (action_space.high - action_space.low) * args.sigma_scale_factor
     explorer = explorers.AdditiveOU(sigma=ou_sigma)
     agent = DDPG(model, opt_a, opt_c, rbuf, gamma=args.gamma,
                  explorer=explorer, replay_start_size=args.replay_start_size,

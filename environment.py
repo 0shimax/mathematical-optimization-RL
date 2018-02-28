@@ -1,3 +1,4 @@
+# https://qiita.com/tomitomi3/items/d4318bf7afbc1c835dda
 import numpy as np
 from chainerrl.env import Env
 
